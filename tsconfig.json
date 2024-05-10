@@ -1,0 +1,56 @@
+{
+    "compilerOptions": {
+        "module": "es2022",
+        "target": "es2022",
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": true,
+        "forceConsistentCasingInFileNames": true,
+        "alwaysStrict": true,
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "removeComments": true,
+        "baseUrl": "./",
+        "rootDir": "./src/",
+        "outDir": "./dist/",
+        "paths": {
+            "app/*": [
+                "./src/app/*"
+            ],
+            "config/*": [
+                "./src/config/*"
+            ],
+            "db/*": [
+                "./src/db/*"
+            ],
+            "di/*": [
+                "./src/di/*"
+            ],
+            "helpers/*": [
+                "./src/helpers/*"
+            ],
+            "utils/*": [
+                "./src/utils/*"
+            ]
+        }
+    },
+    "include": [
+        "./src/**/*.tsx",
+        "./src/**/*.ts"
+    ],
+    "lib": [
+        "es2016"
+    ],
+    "ts-node": {
+        "require": [
+            "tsconfig-paths/register"
+        ]
+    }
+}
