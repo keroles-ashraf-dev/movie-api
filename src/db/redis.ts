@@ -1,13 +1,15 @@
-import "reflect-metadata";
 import { container } from "tsyringe";
 import redis from 'redis';
-import { redis_host, redis_port, redis_username, redis_password } from 'config/db.config';
+import DBConfig from 'config/db.config';
 import { Logger } from "helpers/logger";
 
 const logger: Logger = container.resolve('RedisLogger');
+const dBConfig: DBConfig = container.resolve(DBConfig);
 
 const createClient = async () => {
-    return await redis.createClient({ url: `redis://${redis_username}:${redis_password}@${redis_host}:${redis_port}` })
+    return await redis.createClient({
+        url: `redis://${dBConfig.redis_username}:${dBConfig.redis_password}@${dBConfig.redis_host}:${dBConfig.redis_port}`
+    })
         .on('error', err => logger.error('redis server error', err))
         .on('connect', () => logger.info('redis server connecting'))
         .on('ready', () => logger.info('redis server ready'))

@@ -1,6 +1,6 @@
-import { inject, singleton } from 'tsyringe';
+import { inject, injectable, singleton } from 'tsyringe';
 import jwt from 'jsonwebtoken';
-import { jwt_secret_key, jwt_expires_in_minutes } from 'config/app.config';
+import AppConfig from 'config/app.config';
 import { Logger } from 'helpers/logger';
 
 export interface BaseJWT {
@@ -10,12 +10,16 @@ export interface BaseJWT {
 }
 
 @singleton()
+@injectable()
 export class JWT implements BaseJWT {
-    constructor(@inject('JWTLogger') private logger: Logger) { }
+    constructor(
+        @inject('JWTLogger') private logger: Logger,
+        @inject(AppConfig) private appConfig: AppConfig,
+        ) { }
 
     verify = (token: string): Object | null => {
         try {
-            const decoded = jwt.verify(token, jwt_secret_key!);
+            const decoded = jwt.verify(token, this.appConfig.jwt_secret_key!);
 
             return decoded;
         } catch (err) {
@@ -26,7 +30,7 @@ export class JWT implements BaseJWT {
 
     sign = (payload: Object): string | null => {
         try {
-            const token = jwt.sign(payload, jwt_secret_key!, { expiresIn: jwt_expires_in_minutes * 60 });
+            const token = jwt.sign(payload, this.appConfig.jwt_secret_key!, { expiresIn: this.appConfig.jwt_expires_in_minutes * 60 });
 
             return token;
         } catch (err) {

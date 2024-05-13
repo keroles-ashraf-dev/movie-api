@@ -1,13 +1,16 @@
 import { Sequelize } from 'sequelize';
-import { db_host, db_port, db_name, db_user, db_password } from '../config/db.config';
+import { container } from "tsyringe";
+import DBConfig from 'config/db.config';
+
+const dBConfig: DBConfig = container.resolve(DBConfig);
 
 const conn = new Sequelize({
     dialect: "postgres",
-    host: db_host,
-    port: db_port,
-    database: db_name,
-    username: db_user,
-    password: db_password,
+    host: dBConfig.db_host,
+    port: dBConfig.db_port,
+    database: dBConfig.db_name,
+    username: dBConfig.db_user,
+    password: dBConfig.db_password,
     pool: {
         max: 5,
         min: 0,

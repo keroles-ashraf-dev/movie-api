@@ -17,3 +17,8 @@ export enum ErrorType {
     SECURITY_ERROR = 'SECURITY_ERROR',
     SERVER_ERROR = 'SERVER_ERROR',
 }
+
+export enum UserRole {
+    ADMIN = 'admin',
+    USER = 'user',
+}

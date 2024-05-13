@@ -1,11 +1,13 @@
+import "reflect-metadata";
 import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
 import { RedisClientType } from 'redis';
 import moment from 'moment';
 import { ApiError } from 'helpers/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
-import { window_size_in_hours, max_window_request_count, window_log_interval_in_hours } from 'config/app.config';
+import AppConfig from 'config/app.config';
 
+const appConfig: AppConfig = container.resolve(AppConfig);
 const redis: RedisClientType = container.resolve('Redis');
 
 async function rateLimiting(req: Request, res: Response, next: NextFunction) {
@@ -36,7 +38,7 @@ async function rateLimiting(req: Request, res: Response, next: NextFunction) {
 
     // if record is found, parse it's value and calculate number of requests users has made within the last window
     const data: Record<string, any>[] = JSON.parse(record!);
-    const windowStartTimestamp = moment().subtract(window_size_in_hours, 'hours').unix();
+    const windowStartTimestamp = moment().subtract(appConfig.window_size_in_hours, 'hours').unix();
 
     const requestsWithinWindow = data.filter((entry) => {
         return entry.requestTimeStamp > windowStartTimestamp;
@@ -47,7 +49,7 @@ async function rateLimiting(req: Request, res: Response, next: NextFunction) {
     }, 0);
 
     // if number of requests made is greater than or equal to the desired maximum, return error
-    if (totalWindowRequestsCount >= max_window_request_count) {
+    if (totalWindowRequestsCount >= appConfig.max_window_request_count) {
         throw new ApiError(
             ErrorType.UNKNOWN_ERROR,
             HttpStatusCode.TOO_MANY_REQUESTS,
@@ -57,7 +59,9 @@ async function rateLimiting(req: Request, res: Response, next: NextFunction) {
 
     // if number of requests made is less than allowed maximum, log new entry
     const lastRequestLog = data[data.length - 1];
-    const potentialCurrentWindowIntervalStartTimeStamp = currentRequestTime.subtract(window_log_interval_in_hours, 'hours').unix();
+    const potentialCurrentWindowIntervalStartTimeStamp = currentRequestTime.subtract(
+        appConfig.window_log_interval_in_hours, 'hours'
+        ).unix();
 
     //  if interval has not passed since last request log, increment counter
     if (lastRequestLog.requestTimeStamp > potentialCurrentWindowIntervalStartTimeStamp) {
