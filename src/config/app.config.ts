@@ -10,9 +10,12 @@ export default class AppConfig {
   // server
   env = process.env.ENV;
   port = Number(process.env.API_PORT);
-
-  request_body_size = Number(process.env.REQUEST_BODY_SIZE_IN_KB);
+  
+  // request
   client_origin_url = process.env.CLIENT_ORIGIN_URL;
+  request_body_size = Number(process.env.REQUEST_BODY_SIZE_IN_KB);
+  file_upload_timeout = Number(process.env.FILE_UPLOAD_TIMEOUT);
+  file_upload_size_limit = Number(process.env.FILE_UPLOAD_SIZE_LIMIT);
 
   // jwt
   jwt_secret_key = process.env.JWT_SECRET_KEY;

@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import fileUpload from 'app/middlewares/file.upload';
 import AppConfig from 'config/app.config';
 import errorCatch from 'app/middlewares/error_catch';
 import rateLimiting from 'app/middlewares/rate.limiting';
@@ -34,6 +35,9 @@ export default class App {
         // set 10kb for request body size
         this.app.use(bodyParser.urlencoded({ extended: true, limit: this.appConfig.request_body_size }));
 
+        // set secure HTTP response headers
+        this.app.use(fileUpload());
+        
         // set secure HTTP response headers
         this.app.use(helmet());
 
