@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
 import { ErrorHandler } from 'helpers/error';

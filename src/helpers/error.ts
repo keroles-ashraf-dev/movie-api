@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { env } from "../config/app.config";
+import AppConfig from 'config/app.config';
 import { ErrorType, HttpStatusCode } from "../utils/type";
 import { envDev } from "../utils/constant";
 import apiRes from "./api.response";
@@ -42,7 +42,10 @@ export class ApiError extends BaseError {
 @singleton()
 @injectable()
 export class ErrorHandler {
-    constructor(@inject('GeneralLogger') private logger: Logger) {
+    constructor(
+        @inject('GeneralLogger') private logger: Logger,
+        @inject(AppConfig) private appConfig: AppConfig,
+        ) {
         process.on('uncaughtException', (error: Error) => this.handle(null, error));
 
         process.on('unhandledRejection', function (reason: Error, p: Promise<unknown>) {
@@ -66,7 +69,7 @@ export class ErrorHandler {
             return process.exit(1);
         }
 
-        if (env != envDev) {
+        if (this.appConfig.env != envDev) {
             error.stack = undefined;
 
             // its not development environment

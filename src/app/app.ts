@@ -1,25 +1,76 @@
+import "reflect-metadata";
+import { inject, injectable, singleton } from 'tsyringe';
+import Sequelize from "sequelize/types/sequelize";
 import bodyParser from 'body-parser';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
-import { client_origin_url } from 'config/app.config';
+import AppConfig from 'config/app.config';
 import errorCatch from 'app/middlewares/error_catch';
 import rateLimiting from 'app/middlewares/rate.limiting';
+import authRoutes from 'app/routes/v1/auth.routes';
+import userRoutes from 'app/routes/v1/user.routes';
+import { Logger } from "helpers/logger";
 
-const app = express();
+@injectable()
+@singleton()
+export default class App {
+    app = express();
 
-app.use(bodyParser.json()); // parse requests of content-type - application/json
-app.use(bodyParser.urlencoded({ extended: true })); // parse requests of content-type - application/x-www-form-urlencoded
-app.use(helmet()); // set secure HTTP response headers
-app.use( 
-    cors({
-        origin: client_origin_url, // specify the allowed origins
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-        allowedHeaders: '*' // or specify the allowed headers
-    })
-);
-app.use(rateLimiting); // set rate limiting middleware
+    constructor(
+        @inject('GeneralLogger') private logger: Logger,
+        @inject('Postgres') private postgres: Sequelize,
+        @inject(AppConfig) private appConfig: AppConfig,
+    ) {
+        this.setup();
+    }
 
-app.use(errorCatch); // Error handler middleware
+    setup = (): void => {
+        // parse requests of content-type - application/json
+        // set 10kb for request body size
+        this.app.use(bodyParser.json({ limit: this.appConfig.request_body_size }));
 
-export default app;
+        // parse requests of content-type - application/x-www-form-urlencoded
+        // set 10kb for request body size
+        this.app.use(bodyParser.urlencoded({ extended: true, limit: this.appConfig.request_body_size }));
+
+        // set secure HTTP response headers
+        this.app.use(helmet());
+
+        // set cors
+        this.app.use(
+            cors({
+                origin: this.appConfig.client_origin_url, // specify the allowed origins
+                methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // specify the allowed methods
+                allowedHeaders: '*' // specify the allowed headers
+            })
+        );
+
+        // set rate limiting middleware
+        this.app.use(rateLimiting);
+
+        this.registerRoutes();
+
+        // Error handler middleware
+        this.app.use(errorCatch);
+    }
+
+    registerRoutes = (): void => {
+        this.app.use('/api/v1', authRoutes);
+        this.app.use('/api/v1', userRoutes);
+    }
+
+    run = async (): Promise<void> => {
+        try {
+            this.app.listen(this.appConfig.port, async (): Promise<void> => {
+                // sync models
+                await this.postgres.sync();
+
+                this.logger.info('Server running on port ' + this.appConfig.port);
+            });
+        } catch (err) {
+            this.logger.error('Start server', err);
+            process.exit(1);
+        }
+    }
+}
