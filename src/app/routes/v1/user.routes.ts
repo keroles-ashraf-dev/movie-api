@@ -8,12 +8,10 @@ import authenticate from 'app/middlewares/authenticate';
 import authorize from 'app/middlewares/authorize';
 import { UserRole } from 'utils/type';
 
-const router = Router();
+const router: Router = container.resolve('AppRouter');;
 const userCtrl = container.resolve(UserController);
 
-router.post('/users/create', authorize([UserRole.ADMIN]), validate(createSchema), userCtrl.createUser);
-router.get('/users/get', authenticate, userCtrl.getUser);
-router.put('/users/update', authenticate, validate(updateSchema), userCtrl.updateUser);
-router.delete('/users/delete', authenticate, validate(deleteSchema), userCtrl.deleteUser);
-
-export default router;
+router.post('/users/create', authenticate, authorize([UserRole.ADMIN]), validate(createSchema), userCtrl.create);
+router.get('/users/get', authenticate, userCtrl.get);
+router.put('/users/update', authenticate, validate(updateSchema), userCtrl.update);
+router.delete('/users/delete', authenticate, validate(deleteSchema), userCtrl.delete);

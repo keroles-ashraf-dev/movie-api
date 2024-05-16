@@ -2,15 +2,13 @@ import "reflect-metadata";
 import { inject, injectable, singleton } from 'tsyringe';
 import Sequelize from "sequelize/types/sequelize";
 import bodyParser from 'body-parser';
-import express from 'express';
+import express, { Router } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import fileUpload from 'app/middlewares/file.upload';
 import AppConfig from 'config/app.config';
 import errorCatch from 'app/middlewares/error_catch';
 import rateLimiting from 'app/middlewares/rate.limiting';
-import authRoutes from 'app/routes/v1/auth.routes';
-import userRoutes from 'app/routes/v1/user.routes';
 import { Logger } from "helpers/logger";
 
 @injectable()
@@ -19,7 +17,8 @@ export default class App {
     app = express();
 
     constructor(
-        @inject('GeneralLogger') private logger: Logger,
+        @inject('AppLogger') private logger: Logger,
+        @inject('AppRouter') private appRouter: Router,
         @inject('Postgres') private postgres: Sequelize,
         @inject(AppConfig) private appConfig: AppConfig,
     ) {
@@ -53,15 +52,11 @@ export default class App {
         // set rate limiting middleware
         this.app.use(rateLimiting);
 
-        this.registerRoutes();
+        // set app router
+        this.app.use('/api/v1', this.appRouter);
 
         // Error handler middleware
         this.app.use(errorCatch);
-    }
-
-    registerRoutes = (): void => {
-        this.app.use('/api/v1', authRoutes);
-        this.app.use('/api/v1', userRoutes);
     }
 
     run = async (): Promise<void> => {

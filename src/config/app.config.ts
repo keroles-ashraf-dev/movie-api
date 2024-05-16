@@ -26,6 +26,9 @@ export default class AppConfig {
   window_size_in_hours = Number(process.env.WINDOW_SIZE_IN_HOURS);
   max_window_request_count = Number(process.env.MAX_WINDOW_REQUEST_COUNT);
   window_log_interval_in_hours = Number(process.env.WINDOW_LOG_INTERVAL_IN_HOURS);
+  
+  // cache
+  cache_ttl_in_seconds = Number(process.env.CACHE_TTL_IN_SECONDS);
 
   // path
   log_file_path = process.env.LOG_FILE_PATH;

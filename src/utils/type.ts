@@ -22,3 +22,9 @@ export enum UserRole {
     ADMIN = 'admin',
     USER = 'user',
 }
+
+export enum MovieColor {
+    BW = 'bw',
+    COL = 'col',
+    COL_BW = 'col-bw',
+}

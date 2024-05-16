@@ -14,13 +14,13 @@ export class DBController {
         @inject('BaseDBService') private dbService: BaseDBService,
     ) { }
 
-    seed = async (req: Request, res: Response, next: NextFunction) => {
+    seedMovies = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const files = req.files;
             
-            await this.dbService.seed(files);
+            await this.dbService.seedMovies(files);
 
-            this.logger.error('DB seeding succeeded');
+            this.logger.info('DB seeding succeeded');
 
             return apiRes(res, HttpStatusCode.CREATED, 'Successfully DB seeded', null);
         } catch (err) {

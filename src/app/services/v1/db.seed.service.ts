@@ -1,30 +1,39 @@
 import "reflect-metadata";
-import { singleton } from "tsyringe";
+import { inject, injectable, singleton } from "tsyringe";
 import fileUpload from "express-fileupload";
+import csv from "csvtojson";
 import { ApiError } from 'helpers/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
+import { BaseMovieRepo } from "app/repositories/v1/movie.repo";
 
 export interface BaseDBService {
-    seed(files: fileUpload.FileArray | null | undefined): Promise<void>;
+    seedMovies(files: fileUpload.FileArray | null | undefined): Promise<void>;
 }
 
+@injectable()
 @singleton()
 export class DBService implements BaseDBService {
-    seed = async (files: fileUpload.FileArray | null | undefined): Promise<void> => {
+    constructor(
+        @inject('BaseMovieRepo') private movieRepo: BaseMovieRepo,
+    ) { }
+
+    seedMovies = async (files: fileUpload.FileArray | null | undefined): Promise<void> => {
         if (!files || Object.keys(files).length < 1) {
             throw new ApiError(ErrorType.GENERAL_ERROR, HttpStatusCode.BAD_REQUEST, 'No files were uploaded.');
         }
 
         const uploadedFile = files.file;
 
-        if(uploadedFile instanceof Array){
+        if (uploadedFile instanceof Array) {
             throw new ApiError(ErrorType.GENERAL_ERROR, HttpStatusCode.BAD_REQUEST, 'Multiple files are not supported.');
         }
 
-        if(uploadedFile.mimetype !== 'text/csv'){
+        if (uploadedFile.mimetype !== 'text/csv') {
             throw new ApiError(ErrorType.GENERAL_ERROR, HttpStatusCode.BAD_REQUEST, 'File mimetype should be "text/csv"');
         }
 
-        const data = uploadedFile.data.toJSON();
+        const data: Record<string, any>[] = await csv().fromString(uploadedFile.data.toString());
+
+        await this.movieRepo.bulkCreate(data);
     }
 }
