@@ -1,5 +1,4 @@
 import Joi from "joi";
-import { MovieColor } from "utils/type";
 
 export const createSchema = Joi.object({
     movie_id: Joi.number().integer().positive().required(),

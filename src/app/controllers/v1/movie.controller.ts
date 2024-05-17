@@ -74,16 +74,17 @@ export class MovieController {
             next(err); // Pass error to error-handler middleware
         }
     }
-    
+
     paginate = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            // @ts-ignore
+            const offset = req.params.offset | 0;
+            // @ts-ignore
+            const limit = req.params.limit | 10;
+
             const q: Record<string, any> = {
-                id: req.body.id,
-                title: req.body.title,
-                genre: req.body.genre,
+                genre: req.params.genre,
             }
-            const offset = req.body.offset | 0;
-            const limit = req.body.limit | 10;
 
             const movies: Movie[] = await this.movieService.paginate(q, offset, limit);
 

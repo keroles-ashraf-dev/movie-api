@@ -10,5 +10,5 @@ const router: Router = container.resolve('AppRouter');;
 const userFavoriteMovieCtrl = container.resolve(UserFavoriteMovieController);
 
 router.post('/favorite-movies/create', authenticate, validate(createSchema), userFavoriteMovieCtrl.create);
-router.get('/favorite-movies/', authenticate, validate(getSchema), userFavoriteMovieCtrl.get);
-router.get('/favorite-movies/all', authenticate, userFavoriteMovieCtrl.getAll);
+router.get('/favorite-movies/:id', authenticate, validate(getSchema, 'params'), userFavoriteMovieCtrl.get);
+router.get('/favorite-movies/', authenticate, userFavoriteMovieCtrl.getAll);

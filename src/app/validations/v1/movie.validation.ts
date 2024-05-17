@@ -17,8 +17,6 @@ export const getSchema = Joi.object({
 });
 
 export const paginateSchema = Joi.object({
-    id: Joi.number().integer().positive().optional(),
-    title: Joi.string().min(1).max(255).optional(),
     genre: Joi.string().min(1).max(255).optional(),
     offset: Joi.number().integer().positive().optional(),
     limit: Joi.number().integer().positive().optional(),

@@ -47,7 +47,7 @@ export class UserFavoriteMovieController {
 
     get = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const useFavoriteMovieId = req.body.id;
+            const useFavoriteMovieId: number = Number(req.params.id);
 
             const movie: Movie = await this.userFavoriteMovieService.get(useFavoriteMovieId);
 

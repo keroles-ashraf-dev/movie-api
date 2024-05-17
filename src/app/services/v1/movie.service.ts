@@ -87,20 +87,10 @@ export class MovieService implements BaseMovieService {
     }
 
     paginate = async (q: Record<string, any>, offset: number = 0, limit: number = 10): Promise<Movie[]> => {
-        const id: number | null | undefined = q.id;
-        const title: string | null | undefined = q.title;
         const genre: string | null | undefined = q.genre;
 
         const where = {};
-
-        if (id) {
-            // @ts-ignore
-            where.id = id;
-        }
-        if (title) {
-            // @ts-ignore
-            where.title = { [Op.match]: Sequelize.fn('to_tsquery', title) };
-        }
+        
         if (genre) {
             // @ts-ignore
             where.genre = { [Op.match]: Sequelize.fn('to_tsquery', genre) };
