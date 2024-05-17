@@ -37,7 +37,7 @@ async function rateLimiting(req: Request, res: Response, next: NextFunction) {
     }
 
     // if record is found, parse it's value and calculate number of requests users has made within the last window
-    const data: Record<string, any>[] = JSON.parse(record!);
+    const data: Record<string, any>[] = JSON.parse(record);
     const windowStartTimestamp = moment().subtract(appConfig.window_size_in_hours, 'hours').unix();
 
     const requestsWithinWindow = data.filter((entry) => {

@@ -12,5 +12,5 @@ const router: Router = container.resolve('AppRouter');;
 const movieCtrl = container.resolve(MovieController);
 
 router.post('/movies/create', authenticate, authorize([UserRole.ADMIN]), validate(createSchema), movieCtrl.create);
-router.get('/movies/get', validate(getSchema), movieCtrl.get);
+router.get('/movies/', validate(getSchema), movieCtrl.get);
 router.get('/movies/paginate', validate(paginateSchema), movieCtrl.paginate);

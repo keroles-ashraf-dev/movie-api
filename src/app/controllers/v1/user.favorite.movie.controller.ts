@@ -4,20 +4,26 @@ import { inject, injectable, singleton } from 'tsyringe';
 import { HttpStatusCode } from 'utils/type';
 import apiRes from 'helpers/api.response';
 import { Logger } from 'helpers/logger';
-import { BaseMovieService } from 'app/services/v1/movie.service';
+import { BaseUserFavoriteMovieService } from 'app/services/v1/user.favorite.movie.service';
 import Movie from "app/models/movie.model";
 
 @injectable()
 @singleton()
-export class MovieController {
+export class UserFavoriteMovieController {
     constructor(
-        @inject('MovieLogger') private logger: Logger,
-        @inject('BaseMovieService') private movieService: BaseMovieService,
+        @inject('UseFavoriteMovieLogger') private logger: Logger,
+        @inject('BaseUserFavoriteMovieService') private userFavoriteMovieService: BaseUserFavoriteMovieService,
     ) { }
 
     create = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const movie = await this.movieService.create(req.body);
+            const data = {
+                // @ts-ignore
+                userId: req._user.id,
+                movieId: req.body.movie_id,
+            }
+
+            const movie = await this.userFavoriteMovieService.create(data);
 
             const resData: Record<string, any> = {
                 id: movie.id,
@@ -28,11 +34,12 @@ export class MovieController {
                 length: movie.length,
                 genre: movie.genre,
                 color: movie.color,
+                extData: movie.extData,
             }
 
-            this.logger.info('Movie creating succeeded', resData);
+            this.logger.info('User Favorite Movie creating succeeded', resData);
 
-            return apiRes(res, HttpStatusCode.CREATED, 'Successfully movie created', null, resData);
+            return apiRes(res, HttpStatusCode.CREATED, 'Successfully movie added to favorites', null, resData);
         } catch (err) {
             next(err); // Pass error to error-handler middleware
         }
@@ -40,52 +47,34 @@ export class MovieController {
 
     get = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const q: Record<string, any> = {
-                id: req.body.id,
-                title: req.body.title,
-                genre: req.body.genre,
+            const useFavoriteMovieId = req.body.id;
+
+            const movie: Movie = await this.userFavoriteMovieService.get(useFavoriteMovieId);
+
+            const resData: Record<string, any> = {
+                id: movie.id,
+                title: movie.title,
+                director: movie.director,
+                year: movie.year,
+                country: movie.country,
+                length: movie.length,
+                genre: movie.genre,
+                color: movie.color,
+                extData: movie.extData,
             }
 
-            const movies: Movie[] = await this.movieService.get(q);
-
-            const jsonMovies: Record<string, any>[] = [];
-
-            movies.forEach(movie => {
-                const data: Record<string, any> = {
-                    title: movie.title,
-                    director: movie.director,
-                    year: movie.year,
-                    country: movie.country,
-                    length: movie.length,
-                    genre: movie.genre,
-                    color: movie.color,
-                    extData: movie.extData,
-                }
-
-                jsonMovies.push(data);
-            });
-
-            const resData = {
-                movies: jsonMovies
-            }
-
-            return apiRes(res, HttpStatusCode.CREATED, 'Successfully movie fetched', null, resData);
+            return apiRes(res, HttpStatusCode.CREATED, 'Successfully favorite movie fetched', null, resData);
         } catch (err) {
             next(err); // Pass error to error-handler middleware
         }
     }
-    
-    paginate = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const q: Record<string, any> = {
-                id: req.body.id,
-                title: req.body.title,
-                genre: req.body.genre,
-            }
-            const offset = req.body.offset | 0;
-            const limit = req.body.limit | 10;
 
-            const movies: Movie[] = await this.movieService.paginate(q, offset, limit);
+    getAll = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // @ts-ignore
+            const userId: number = req._user.id;
+
+            const movies: Movie[] = await this.userFavoriteMovieService.getAll(userId);
 
             const jsonMovies: Record<string, any>[] = [];
 
@@ -108,7 +97,7 @@ export class MovieController {
                 movies: jsonMovies
             }
 
-            return apiRes(res, HttpStatusCode.CREATED, 'Successfully movie fetched', null, resData);
+            return apiRes(res, HttpStatusCode.CREATED, 'Successfully favorite movies fetched', null, resData);
         } catch (err) {
             next(err); // Pass error to error-handler middleware
         }
