@@ -14,7 +14,7 @@ export class UserController {
         @inject('BaseUserService') private userService: BaseUserService,
     ) { }
 
-    createUser = async (req: Request, res: Response, next: NextFunction) => {
+    create = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const data = await this.userService.create(req.body);
 
@@ -24,7 +24,7 @@ export class UserController {
                 role: data.role,
             }
 
-            this.logger.error('User creating succeeded', resData);
+            this.logger.info('User creating succeeded', resData);
 
             return apiRes(res, HttpStatusCode.CREATED, 'Successfully user created', null, resData);
         } catch (err) {
@@ -32,7 +32,7 @@ export class UserController {
         }
     }
 
-    getUser = async (req: Request, res: Response, next: NextFunction) => {
+    get = async (req: Request, res: Response, next: NextFunction) => {
         try {
             // @ts-ignore
             const userId = req._user.id;
@@ -51,7 +51,7 @@ export class UserController {
         }
     }
 
-    updateUser = async (req: Request, res: Response, next: NextFunction) => {
+    update = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userData = {
                 // @ts-ignore
@@ -74,7 +74,7 @@ export class UserController {
         }
     }
 
-    deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    delete = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userData = {
                 // @ts-ignore
@@ -88,7 +88,7 @@ export class UserController {
                 username: data.username,
             }
 
-            this.logger.error('User deleting succeeded', resData);
+            this.logger.info('User deleting succeeded', resData);
 
             return apiRes(res, HttpStatusCode.CREATED, 'Successfully user deleted', null, resData);
         } catch (err) {

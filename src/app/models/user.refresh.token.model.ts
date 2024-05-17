@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { container } from 'tsyringe';
 import { Model, DataTypes } from 'sequelize';
 import { ulid } from 'ulid';
-import conn from '../../db/postgres';
+import conn from '../../db/connection';
 import User from './user.model';
 import AppConfig from 'config/app.config';
 

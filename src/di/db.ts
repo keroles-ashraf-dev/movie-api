@@ -1,6 +1,4 @@
 import { container } from 'tsyringe';
-import postgres from 'db/postgres';
-import redis from 'db/redis';
+import postgres from 'db/connection';
 
 container.register('Postgres', { useValue: postgres });
-container.register('Redis', { useValue: redis });

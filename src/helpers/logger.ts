@@ -1,19 +1,18 @@
-import { inject, injectable, singleton } from "tsyringe";
+import { container } from "tsyringe";
 import winston from "winston";
 import AppConfig from 'config/app.config';
 import { envDev } from 'utils/constant';
 
 // logging format => date + logger level + message + {data}
 
-@singleton()
-@injectable()
 export class Logger {
+    private appConfig: AppConfig;
     private logger: winston.Logger;
 
     constructor(
-        @inject(AppConfig) private appConfig: AppConfig,
         route: string = 'general',
-        ) {
+    ) {
+        this.appConfig = container.resolve(AppConfig);
         this.logger = winston.createLogger({
             level: 'info',
             format: winston.format.printf(info => {
@@ -22,11 +21,11 @@ export class Logger {
                 return msg;
             }),
             transports: [
-                new winston.transports.File({ filename: appConfig.log_file_path + '/' + this.dateFormat() + '/' + route + '.log' }),
+                new winston.transports.File({ filename: this.appConfig.log_file_path + '/' + this.dateFormat() + '/' + route + '.log' }),
             ],
         });
 
-        if (appConfig.env == envDev) {
+        if (this.appConfig.env == envDev) {
             this.logger.add(new winston.transports.Console({
                 format: winston.format.simple(),
             }));
