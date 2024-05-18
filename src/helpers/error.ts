@@ -43,7 +43,7 @@ export class ApiError extends BaseError {
 @injectable()
 export class ErrorHandler {
     constructor(
-        @inject('GeneralLogger') private logger: Logger,
+        @inject('AppLogger') private logger: Logger,
         @inject(AppConfig) private appConfig: AppConfig,
         ) {
         process.on('uncaughtException', (error: Error) => this.handle(null, error));

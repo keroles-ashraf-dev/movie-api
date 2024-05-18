@@ -8,9 +8,11 @@ import authenticate from 'app/middlewares/authenticate';
 import authorize from 'app/middlewares/authorize';
 import { UserRole } from 'utils/type';
 
-const router: Router = container.resolve('AppRouter');;
+const router: Router = Router();
 const movieCtrl = container.resolve(MovieController);
 
 router.post('/movies/create', authenticate, authorize([UserRole.ADMIN]), validate(createSchema), movieCtrl.create);
 router.get('/movies/get', validate(getSchema, 'params'), movieCtrl.get);
 router.get('/movies/paginate', validate(paginateSchema), movieCtrl.paginate);
+
+export default router;

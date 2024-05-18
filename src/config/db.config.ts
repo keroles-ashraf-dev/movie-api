@@ -1,12 +1,11 @@
+import "reflect-metadata";
 import dotenv from 'dotenv';
 import { singleton } from 'tsyringe';
 
+dotenv.config({ path: '.env' });
+
 @singleton()
 export default class DBConfig {
-  constructor() {
-    dotenv.config({ path: '.env' });
-  }
-
   // db
   db_host = String(process.env.DB_HOST);
   db_port = Number(process.env.DB_PORT);
@@ -17,6 +16,5 @@ export default class DBConfig {
   // redis
   redis_host = String(process.env.REDIS_HOST);
   redis_port = String(process.env.REDIS_PORT);
-  redis_username = String(process.env.REDIS_USERNAME);
   redis_password = String(process.env.REDIS_PASSWORD);
 }

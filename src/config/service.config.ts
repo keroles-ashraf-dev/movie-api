@@ -1,12 +1,10 @@
 import dotenv from 'dotenv';
 import { singleton } from 'tsyringe';
 
+dotenv.config({ path: '.env' });
+
 @singleton()
 export default class ServiceConfig {
-  constructor() {
-    dotenv.config({ path: '.env' });
-  }
-
   // themoviedb
   themoviedb_api_key = process.env.THEMOVIEDB_api_key;
   themoviedb_api_base = 'https://api.themoviedb.org/3';

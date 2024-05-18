@@ -16,7 +16,7 @@ export default class Movie extends Model {
 
 Movie.init({
     id: {
-        type: DataTypes.INTEGER.UNSIGNED(),
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
@@ -27,13 +27,13 @@ Movie.init({
         type: DataTypes.STRING(),
     },
     year: {
-        type: DataTypes.INTEGER.UNSIGNED(),
+        type: DataTypes.INTEGER,
     },
     country: {
         type: DataTypes.STRING(),
     },
     length: {
-        type: DataTypes.INTEGER.UNSIGNED(),
+        type: DataTypes.INTEGER,
     },
     genre: {
         type: DataTypes.TSVECTOR(),

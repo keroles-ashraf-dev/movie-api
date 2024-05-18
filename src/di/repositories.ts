@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { container } from 'tsyringe';
 import { UserRefreshTokenRepo } from 'app/repositories/v1/user.refresh.token.repo';
 import { UserRepo } from 'app/repositories/v1/user.repo';
