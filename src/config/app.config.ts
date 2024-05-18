@@ -1,12 +1,11 @@
+import "reflect-metadata";
 import dotenv from 'dotenv';
 import { singleton } from 'tsyringe';
 
+dotenv.config({ path: '.env' });
+
 @singleton()
 export default class AppConfig {
-  constructor() {
-    dotenv.config({ path: '.env' });
-  }
-
   // server
   env = process.env.ENV;
   port = Number(process.env.API_PORT);

@@ -1,6 +1,7 @@
-import './app';
+import "reflect-metadata";
+import './loggers';
+import './helpers';
 import './cache';
 import './db';
-import './helpers';
-import './loggers';
 import './repositories';
+import './services';

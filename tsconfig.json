@@ -52,6 +52,9 @@
         "es2016"
     ],
     "ts-node": {
+        "compilerOptions": {
+            "module": "commonjs"
+        },
         "require": [
             "tsconfig-paths/register"
         ]

@@ -10,13 +10,13 @@ export class Logger {
     private logger: winston.Logger;
 
     constructor(
-        route: string = 'general',
+        route: string = 'app',
     ) {
         this.appConfig = container.resolve(AppConfig);
         this.logger = winston.createLogger({
             level: 'info',
             format: winston.format.printf(info => {
-                let msg = this.dateTimeFormat() + ' | ' + info.level.toUpperCase + ' | ' + info.message;
+                let msg = this.dateTimeFormat() + ' | ' + info.level.toUpperCase() + ' | ' + info.message;
                 msg = info.data ? msg + ' | ' + JSON.stringify(info.data) : msg;
                 return msg;
             }),
@@ -50,10 +50,10 @@ export class Logger {
 
 
     private dateTimeFormat = () => {
-        return new Date(Date.now()).toLocaleString;
+        return new Date(Date.now()).toString();
     }
 
     private dateFormat = () => {
-        return new Date(Date.now()).toLocaleDateString;
+        return new Date(Date.now()).toDateString();
     }
 }

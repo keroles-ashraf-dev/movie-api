@@ -12,12 +12,12 @@ export default class UserFavoriteMovie extends Model {
 
 UserFavoriteMovie.init({
     id: {
-        type: DataTypes.INTEGER.UNSIGNED(),
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     userId: {
-        type: DataTypes.INTEGER.UNSIGNED(),
+        type: DataTypes.INTEGER,
         references: {
             model: User,
             key: 'id'
@@ -26,7 +26,7 @@ UserFavoriteMovie.init({
         onUpdate: 'CASCADE',
     },
     movieId: {
-        type: DataTypes.INTEGER.UNSIGNED(),
+        type: DataTypes.INTEGER,
         references: {
             model: Movie,
             key: 'id'
