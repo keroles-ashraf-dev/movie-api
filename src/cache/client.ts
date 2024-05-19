@@ -4,7 +4,7 @@ import * as redis from 'redis';
 import DBConfig from 'config/db.config';
 import { Logger } from "helpers/logger";
 
-const logger: Logger = container.resolve('RedisLogger');
+const logger: Logger = container.resolve('CacheLogger');
 const dBConfig: DBConfig = container.resolve(DBConfig);
 
 const client = redis.createClient({

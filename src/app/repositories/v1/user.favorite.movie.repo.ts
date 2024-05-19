@@ -1,14 +1,15 @@
 import "reflect-metadata";
 import { inject, injectable, singleton } from 'tsyringe';
+import bcrypt from "bcryptjs";
 import { BaseCache } from "cache/cache";
 import UserFavoriteMovie from "app/models/user.favorite.movie.model";
 
 export interface BaseUserFavoriteMovieRepo {
     create(data: Record<string, any>): Promise<UserFavoriteMovie>;
 
-    findOne(query: any): Promise<UserFavoriteMovie | null>;
+    findOne(query: Record<string, any>): Promise<UserFavoriteMovie | null>;
 
-    findAll(query: any): Promise<UserFavoriteMovie[]>;
+    findAll(query: Record<string, any>): Promise<UserFavoriteMovie[]>;
 }
 
 @injectable()
@@ -22,30 +23,31 @@ export class UserFavoriteMovieRepo implements BaseUserFavoriteMovieRepo {
         const favoriteMovie = await UserFavoriteMovie.create(data);
 
         return favoriteMovie;
-    }
+    } 
 
-    findOne = async (query: any): Promise<UserFavoriteMovie | null> => {
-        const data = await this.cache.get(query);
+    findOne = async (query: Record<string, any>): Promise<UserFavoriteMovie | null> => {
+        const data = await this.cache.get(this.cacheKey(query));
 
-        let favoriteMovie: UserFavoriteMovie;
+        let favoriteMovie: UserFavoriteMovie | null;
 
         if (data) {
             const json = JSON.parse(data);
             favoriteMovie = UserFavoriteMovie.build(json);
         } else {
             favoriteMovie = await UserFavoriteMovie.findOne(query);
-        }
 
-        if(favoriteMovie){
             // cache result
-            await this.cache.set(query, favoriteMovie.dataValues)
+            if(favoriteMovie) await this.cache.set(
+                this.cacheKey(query),
+                JSON.stringify(favoriteMovie.toJSON())
+            );
         }
 
         return favoriteMovie;
     }
 
-    findAll = async (query: any): Promise<UserFavoriteMovie[]> => {
-        const data = await this.cache.get(query);
+    findAll = async (query: Record<string, any>): Promise<UserFavoriteMovie[]> => {
+        const data = await this.cache.get(this.cacheKey(query));
 
         let favoriteMovies: UserFavoriteMovie[];
 
@@ -54,13 +56,18 @@ export class UserFavoriteMovieRepo implements BaseUserFavoriteMovieRepo {
             favoriteMovies = json.map(e => UserFavoriteMovie.build(e)); 
         } else {
             favoriteMovies = await UserFavoriteMovie.findAll(query);
-        }
 
-        if(favoriteMovies){
             // cache results
-            await this.cache.set(query, favoriteMovies.map(e => e.dataValues))
+            if(favoriteMovies) await this.cache.set(
+                this.cacheKey(query),
+                JSON.stringify(favoriteMovies.map(e => e.toJSON()))
+            );
         }
 
         return favoriteMovies;
+    }
+
+    private cacheKey = (key: any) => {
+        return `user.fav.movies.${JSON.stringify(key)}`;
     }
 }
