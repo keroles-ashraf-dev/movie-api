@@ -7,6 +7,7 @@ import { BaseMovieRepo } from "app/repositories/v1/movie.repo";
 import { BaseExternalMovieRepo } from "app/repositories/v1/external.movie.repo";
 import Movie from "app/models/movie.model";
 import runInTransaction from "helpers/run.in.transaction";
+import { Op } from "sequelize";
 
 export interface BaseUserFavoriteMovieService {
     create(data: Record<string, any>): Promise<Movie>;
@@ -37,6 +38,16 @@ export class UserFavoriteMovieService implements BaseUserFavoriteMovieService {
                     ErrorType.GENERAL_ERROR,
                     HttpStatusCode.NOT_FOUND,
                     'Movie notfound.',
+                );
+            }
+
+            const alreadyFav = await this.userFavoriteMovieRepo.findOne({ where: { movie_id: movieId, user_id: userId } });
+
+            if (alreadyFav) {
+                throw new ApiError(
+                    ErrorType.GENERAL_ERROR,
+                    HttpStatusCode.BAD_REQUEST,
+                    'Movie already in your favorite list.',
                 );
             }
 
@@ -124,7 +135,7 @@ export class UserFavoriteMovieService implements BaseUserFavoriteMovieService {
         if (userFavoriteMovies.length > 0) {
             const ids = userFavoriteMovies.flatMap(e => e.movieId);
 
-            movies = await this.movieRepo.findAll({ where: { id: ids } });
+            movies = await this.movieRepo.findAll({ where: { id: { [Op.in]: ids} } });
         }
 
         return movies;

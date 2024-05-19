@@ -20,9 +20,15 @@ export class Cache implements BaseCache {
   set = async (key: any, value: any): Promise<void> => {
     await this.client.setEx(String(key), this.appConfig.cache_ttl_in_seconds, JSON.stringify(value));
   }
-
+  
   get = async (key: any): Promise<string | null> => {
-    let data = await this.client.get(String(key));
+    const exists = await this.client.exists(String(key));
+
+    let data = null;
+
+    if(exists == 1){
+      data = await this.client.get(String(key));
+    }
 
     return data;
   }

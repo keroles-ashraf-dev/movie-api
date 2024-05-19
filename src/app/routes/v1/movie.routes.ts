@@ -12,7 +12,7 @@ const router: Router = Router();
 const movieCtrl = container.resolve(MovieController);
 
 router.post('/movies/create', authenticate, authorize([UserRole.ADMIN]), validate(createSchema), movieCtrl.create);
-router.get('/movies/get', validate(getSchema, 'params'), movieCtrl.get);
-router.get('/movies/paginate', validate(paginateSchema), movieCtrl.paginate);
+router.get('/movies/get', validate(getSchema, 'query'), movieCtrl.get);
+router.get('/movies/paginate', validate(paginateSchema, 'query'), movieCtrl.paginate);
 
 export default router;

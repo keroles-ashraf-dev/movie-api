@@ -1,17 +1,19 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes, CreateOptions } from 'sequelize';
 import conn from 'db/connection';
 import { MovieColor } from 'utils/type';
+import sequelize from 'sequelize';
 
 export default class Movie extends Model {
     declare id: number;
     declare title: string;
     declare director: string;
-    declare year: number;
+    declare year: string;
     declare country: string;
     declare length: number;
     declare genre: string;
     declare color: string
     declare extData: string | null;
+    declare tsvector: string
 }
 
 Movie.init({
@@ -21,13 +23,13 @@ Movie.init({
         primaryKey: true
     },
     title: {
-        type: DataTypes.TSVECTOR(),
+        type: DataTypes.STRING(),
     },
     director: {
         type: DataTypes.STRING(),
     },
     year: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(),
     },
     country: {
         type: DataTypes.STRING(),
@@ -36,7 +38,7 @@ Movie.init({
         type: DataTypes.INTEGER,
     },
     genre: {
-        type: DataTypes.TSVECTOR(),
+        type: DataTypes.STRING(),
 
     },
     color: {
@@ -46,6 +48,9 @@ Movie.init({
         type: DataTypes.JSON(),
         allowNull: true,
         defaultValue: null,
+    },
+    tsvector: {
+        type: DataTypes.TSVECTOR(),
     }
 }, {
     sequelize: conn,
@@ -53,4 +58,29 @@ Movie.init({
     modelName: 'movie',
     underscored: true,
     timestamps: false
+});
+
+Movie.beforeSave(async (movie: Movie, options: CreateOptions) => { 
+    if (movie.changed('title') || movie.changed('director') || movie.changed('genre')) {
+        // @ts-ignore
+        movie.tsvector = sequelize.fn(
+            'to_tsvector', 
+            'english', 
+            `${movie.title.replace(/[^a-zA-Z ]/g, "")} || ' ' || ${movie.director.replace(/[^a-zA-Z ]/g, "")} || ' ' || ${movie.genre.replace(/[^a-zA-Z ]/g, "")}`
+        );
+    }
+});
+
+Movie.beforeBulkCreate(async (movies: Movie[], options: CreateOptions) => { 
+    for(let i: number = 0; i < movies.length; i++){
+        const movie = movies[i];
+        
+        // @ts-ignore
+        movie.tsvector = sequelize.fn(
+            'to_tsvector', 
+            'english',
+            `${movie.title.replace(/[^a-zA-Z ]/g, "")} || ' ' || ${movie.director.replace(/[^a-zA-Z ]/g, "")} || ' ' || ${movie.genre.replace(/[^a-zA-Z ]/g, "")}`
+        );
+        
+    }
 });

@@ -16,7 +16,7 @@ export class MovieController {
     ) { }
 
     create = async (req: Request, res: Response, next: NextFunction) => {
-        try {
+        try { 
             const movie = await this.movieService.create(req.body);
 
             const resData: Record<string, any> = {
@@ -41,9 +41,10 @@ export class MovieController {
     get = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const q: Record<string, any> = {
-                id: req.body.id,
-                title: req.body.title,
-                genre: req.body.genre,
+                id: req.query.id,
+                title: req.query.title,
+                director: req.query.director,
+                genre: req.query.genre,
             }
 
             const movies: Movie[] = await this.movieService.get(q);
@@ -78,12 +79,14 @@ export class MovieController {
     paginate = async (req: Request, res: Response, next: NextFunction) => {
         try {
             // @ts-ignore
-            const offset = req.params.offset | 0;
+            const offset = req.query.offset | 0;
             // @ts-ignore
-            const limit = req.params.limit | 10;
+            const limit = req.query.limit | 10;
 
             const q: Record<string, any> = {
-                genre: req.params.genre,
+                title: req.query.title,
+                director: req.query.director,
+                genre: req.query.genre,
             }
 
             const movies: Movie[] = await this.movieService.paginate(q, offset, limit);

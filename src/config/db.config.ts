@@ -6,6 +6,10 @@ dotenv.config({ path: '.env' });
 
 @singleton()
 export default class DBConfig {
+  // admin account
+  admin_initial_username = String(process.env.ADMIN_INITIAL_USERNAME);
+  admin_initial_password = String(process.env.ADMIN_INITIAL_PASSWORD);
+
   // db
   db_host = String(process.env.DB_HOST);
   db_port = Number(process.env.DB_PORT);
