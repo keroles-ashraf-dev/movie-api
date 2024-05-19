@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-1- docker
+1- docker<br/>
 2- docker-compose
 
 
