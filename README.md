@@ -1,5 +1,12 @@
 # Movie api
 
+## Features
+
+1- Authentication & Authorization<br/>
+2- Caching (Redis)<br/>
+3- Rate Limiting<br/>
+3- The Movie DB Api Integration<br/>
+
 ## Prerequisites
 
 1- docker<br/>
