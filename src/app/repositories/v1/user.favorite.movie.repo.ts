@@ -27,7 +27,7 @@ export class UserFavoriteMovieRepo implements BaseUserFavoriteMovieRepo {
     findOne = async (query: Record<string, any>): Promise<UserFavoriteMovie | null> => {
         const data = await this.cache.get(this.cacheKey(query));
 
-        let favoriteMovie: UserFavoriteMovie;
+        let favoriteMovie: UserFavoriteMovie | null;
 
         if (data) {
             const json = JSON.parse(data);
