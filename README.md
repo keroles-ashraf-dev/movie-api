@@ -21,7 +21,9 @@ npm run test
 ```console
 cp .env.example .env
 ```
-2- build images and run containers
+2- add "TheMovieDB Api Key" to .env file
+
+3- build images and run containers
 ```console
 docker-compose -f docker-compose.yml -f docker-compose-prod.yml --env-file ./.env up
 ```
