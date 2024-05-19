@@ -74,7 +74,11 @@ export class AuthService implements BaseAuthService {
         }
 
         const userCreatedData = {
-            user: user,
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+            },
             accessToken: accessToken,
             refreshToken: refreshToken,
         }
@@ -108,7 +112,11 @@ export class AuthService implements BaseAuthService {
         }
 
         const data = {
-            user: user,
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+            },
             accessToken: accessToken,
             refreshToken: refreshToken,
         }
@@ -148,7 +156,11 @@ export class AuthService implements BaseAuthService {
         }
 
         const data = {
-            user: user,
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+            },
             accessToken: accessToken,
             refreshToken: refreshToken,
         }

@@ -26,8 +26,9 @@ export class TMDBMovieRepo implements BaseExternalMovieRepo {
 
             if (res.status != HttpStatusCode.OK || !res.data) throw Error(res.statusText);
 
-            const json = JSON.parse(res.data);
-            const results: Record<string, any>[] | null | undefined = json['results'];
+            if (!res.data.results) throw Error('No results');
+
+            const results: Record<string, any>[] = res.data.results;
 
             if (!results) throw Error('No results');
 
@@ -35,8 +36,8 @@ export class TMDBMovieRepo implements BaseExternalMovieRepo {
 
             for (const e of results) {
                 // validate title and year
-                if (e['title'].toLowerCase() == movie.title.toLowerCase()
-                    && new Date(e['release_date']).getUTCFullYear() == movie.year
+                if (e['title'].toLowerCase() == movie.title.toLowerCase() &&
+                    new Date(e['release_date']).getUTCFullYear().toString() == movie.year
                 ) {
                     result = e;
                     break;
@@ -68,8 +69,8 @@ export class TMDBMovieRepo implements BaseExternalMovieRepo {
 
             for (const e of results) {
                 // validate title and year
-                if (e['title'].toLowerCase() == movie.title.toLowerCase()
-                    && new Date(e['release_date']).getUTCFullYear() == movie.year
+                if (e['title'].toLowerCase() == movie.title.toLowerCase() &&
+                    new Date(e['release_date']).getUTCFullYear().toString() == movie.year
                 ) {
                     result = e;
                     break;

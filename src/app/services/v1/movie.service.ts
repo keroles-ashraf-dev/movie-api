@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { inject, injectable, singleton } from 'tsyringe';
-import { Op } from 'sequelize';
+import sequelize from 'sequelize';
 import { BaseMovieRepo } from 'app/repositories/v1/movie.repo';
 import { ApiError } from 'helpers/error';
 import { ErrorType, HttpStatusCode } from 'utils/type';
@@ -24,7 +24,7 @@ export class MovieService implements BaseMovieService {
     create = async (data: Record<string, any>): Promise<Movie> => {
         const title: string = data.title;
         const director: string = data.director;
-        const year: number = data.year;
+        const year: string = data.year;
         const country: string = data.country;
         const length: number = data.length;
         const genre: string = data.genre;
@@ -56,6 +56,7 @@ export class MovieService implements BaseMovieService {
     get = async (q: Record<string, any>): Promise<Movie[]> => {
         const id: number | null | undefined = q.id;
         const title: string | null | undefined = q.title;
+        const director: string | null | undefined = q.director;
         const genre: string | null | undefined = q.genre;
 
         const where = {};
@@ -64,16 +65,31 @@ export class MovieService implements BaseMovieService {
             // @ts-ignore
             where.id = id;
         }
+
+        let searchable = '';
         if (title) {
-            // @ts-ignore
-            where.title = { [Op.match]: Sequelize.fn('to_tsquery', title) };
+            searchable = title; 
+        }
+        if (director) {
+            searchable = searchable.length > 0 ? `${searchable} | ${director}` : director; 
         }
         if (genre) {
+            searchable = searchable.length > 0 ? `${searchable} | ${genre}` : genre; 
+        }
+        
+        if (title || director || genre) {
             // @ts-ignore
-            where.genre = { [Op.match]: Sequelize.fn('to_tsquery', genre) };
+            where.tsvector = { [sequelize.Op.match]: sequelize.fn('to_tsquery', searchable) };
         }
 
-        const movies = await this.movieRepo.findAll({ where: where });
+        const query = {};
+
+        if(Object.keys(where).length > 0){
+            // @ts-ignore
+            query.where = where;
+        }
+
+        const movies = await this.movieRepo.findAll(query);
 
         if (!movies) {
             throw new ApiError(
@@ -87,19 +103,36 @@ export class MovieService implements BaseMovieService {
     }
 
     paginate = async (q: Record<string, any>, offset: number = 0, limit: number = 10): Promise<Movie[]> => {
+        const title: string | null | undefined = q.title;
+        const director: string | null | undefined = q.director;
         const genre: string | null | undefined = q.genre;
 
         const where = {};
-        
+
+        let searchable = '';
+        if (title) {
+            searchable = title; 
+        }
+        if (director) {
+            searchable = searchable.length > 0 ? `${searchable} | ${director}` : director; 
+        }
         if (genre) {
+            searchable = searchable.length > 0 ? `${searchable} | ${genre}` : genre; 
+        }
+        
+        if (title || director || genre) {
             // @ts-ignore
-            where.genre = { [Op.match]: Sequelize.fn('to_tsquery', genre) };
+            where.tsvector = { [sequelize.Op.match]: sequelize.fn('to_tsquery', searchable) };
         }
 
         const query = {
-            where: where,
             limit: limit,
             offset: offset,
+        }
+
+        if(Object.keys(where).length > 0){
+            // @ts-ignore
+            query.where = where;
         }
 
         const movies = await this.movieRepo.findAll(query);

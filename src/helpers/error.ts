@@ -45,11 +45,11 @@ export class ErrorHandler {
     constructor(
         @inject('AppLogger') private logger: Logger,
         @inject(AppConfig) private appConfig: AppConfig,
-        ) {
+    ) {
         process.on('uncaughtException', (error: Error) => this.handle(null, error));
 
-        process.on('unhandledRejection', function (reason: Error, p: Promise<unknown>) {
-            throw reason;
+        process.on('unhandledRejection',  (reason: Error, p: Promise<unknown>) => {
+            this.handle(null, reason);
         });
     }
 
@@ -64,7 +64,7 @@ export class ErrorHandler {
     public handle = (res: Response | null, error: Error) => {
         this.logger.error('Error', error);
 
-        if (!this.isTrustedError(error) || res == null) {
+        if (!this.isTrustedError(error) || !res) {
             // its not operational error
             return process.exit(1);
         }

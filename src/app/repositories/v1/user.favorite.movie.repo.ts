@@ -34,9 +34,11 @@ export class UserFavoriteMovieRepo implements BaseUserFavoriteMovieRepo {
             favoriteMovie = UserFavoriteMovie.build(json);
         } else {
             favoriteMovie = await UserFavoriteMovie.findOne(query);
+        }
 
+        if(favoriteMovie){
             // cache result
-            await this.cache.set(query, favoriteMovie.toJSON())
+            await this.cache.set(query, favoriteMovie.dataValues)
         }
 
         return favoriteMovie;
@@ -49,12 +51,14 @@ export class UserFavoriteMovieRepo implements BaseUserFavoriteMovieRepo {
 
         if (data) {
             const json: [] = JSON.parse(data);
-            favoriteMovies = json.map(e => UserFavoriteMovie.build(e));
+            favoriteMovies = json.map(e => UserFavoriteMovie.build(e)); 
         } else {
             favoriteMovies = await UserFavoriteMovie.findAll(query);
+        }
 
+        if(favoriteMovies){
             // cache results
-            await this.cache.set(query, favoriteMovies.map(e => e.toJSON()))
+            await this.cache.set(query, favoriteMovies.map(e => e.dataValues))
         }
 
         return favoriteMovies;

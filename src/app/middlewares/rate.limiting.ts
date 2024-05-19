@@ -52,7 +52,7 @@ async function rateLimiting(req: Request, res: Response, next: NextFunction) {
         }, 0);
 
         // if number of requests made is greater than or equal to the desired maximum, return error
-        if (totalWindowRequestsCount >= 6) {
+        if (totalWindowRequestsCount >= appConfig.max_window_request_count) { 
             throw new ApiError(
                 ErrorType.UNKNOWN_ERROR,
                 HttpStatusCode.TOO_MANY_REQUESTS,

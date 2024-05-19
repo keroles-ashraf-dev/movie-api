@@ -13,11 +13,14 @@ export const createSchema = Joi.object({
 export const getSchema = Joi.object({
     id: Joi.number().integer().positive().optional(),
     title: Joi.string().min(1).max(255).optional(),
+    director: Joi.string().min(1).max(255).optional(),
     genre: Joi.string().min(1).max(255).optional(), 
 });
 
 export const paginateSchema = Joi.object({
-    genre: Joi.string().min(1).max(255).optional(),
+    title: Joi.string().min(1).max(255).optional(),
+    director: Joi.string().min(1).max(255).optional(),
+    genre: Joi.string().min(1).max(255).optional(), 
     offset: Joi.number().integer().positive().optional(),
     limit: Joi.number().integer().positive().optional(),
 });

@@ -50,10 +50,10 @@ export class Logger {
 
 
     private dateTimeFormat = () => {
-        return new Date(Date.now()).toString();
+        return new Date(Date.now()).toLocaleString();
     }
 
     private dateFormat = () => {
-        return new Date(Date.now()).toDateString();
+        return new Date(Date.now()).toLocaleDateString();
     }
 }

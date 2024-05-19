@@ -33,7 +33,7 @@ export default class UserRefreshToken extends Model {
 
 UserRefreshToken.init({
     token: {
-        type: DataTypes.UUID,
+        type: DataTypes.STRING(128),
         unique: true,
     },
     userId: {

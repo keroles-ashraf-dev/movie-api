@@ -37,7 +37,7 @@ export class MovieRepo implements BaseMovieRepo {
     findOne = async (query: any): Promise<Movie | null> => {
         const data = await this.cache.get(query);
 
-        let movie: Movie;
+        let movie: Movie; 
 
         if (data) {
             const json = JSON.parse(data);
@@ -81,7 +81,15 @@ export class MovieRepo implements BaseMovieRepo {
 
         if (!movie) return null;
 
-        const modifiedMovie = await movie.update(data);
+        if(data.extData){
+            movie.setDataValue('extData', data.extData);
+        }
+        
+        let modifiedMovie = null;
+
+        if(movie.changed()){
+            modifiedMovie = await movie.save();
+        }
 
         return modifiedMovie;
     }
