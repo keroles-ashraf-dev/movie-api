@@ -25,5 +25,5 @@ cp .env.example .env
 
 3- build images and run containers
 ```console
-docker-compose -f docker-compose.yml -f docker-compose-prod.yml --env-file ./.env up
+docker-compose -f ./docker-compose.yml -f ./docker-compose-prod.yml --env-file ./.env up
 ```
