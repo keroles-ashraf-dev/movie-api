@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import { inject, injectable, singleton } from 'tsyringe';
-import bcrypt from "bcryptjs";
 import { BaseCache } from "cache/cache";
 import UserFavoriteMovie from "app/models/user.favorite.movie.model";
 
@@ -28,7 +27,7 @@ export class UserFavoriteMovieRepo implements BaseUserFavoriteMovieRepo {
     findOne = async (query: Record<string, any>): Promise<UserFavoriteMovie | null> => {
         const data = await this.cache.get(this.cacheKey(query));
 
-        let favoriteMovie: UserFavoriteMovie | null;
+        let favoriteMovie: UserFavoriteMovie;
 
         if (data) {
             const json = JSON.parse(data);

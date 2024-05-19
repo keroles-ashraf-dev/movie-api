@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import { inject, injectable, singleton } from 'tsyringe';
-import bcrypt from "bcryptjs";
 import Movie from 'app/models/movie.model';
 import { BaseCache } from "cache/cache";
 
