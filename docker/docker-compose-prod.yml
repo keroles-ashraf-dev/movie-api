@@ -16,7 +16,7 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-      target: dev
+      target: prod
     env_file:
       - ../.env
     ports:
