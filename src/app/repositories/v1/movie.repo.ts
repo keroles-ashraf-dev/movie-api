@@ -4,93 +4,111 @@ import Movie from 'app/models/movie.model';
 import { BaseCache } from "cache/cache";
 
 export interface BaseMovieRepo {
-    create(data: Record<string, any>): Promise<Movie>;
+	create(data: Record<string, any>): Promise<Movie>;
 
-    bulkCreate(data: Record<string, any>[]): Promise<Movie[]>;
+	bulkCreate(data: Record<string, any>[]): Promise<Movie[]>;
 
-    findOne(query: any): Promise<Movie | null>;
+	findOne(query: Record<string, any>): Promise<Movie | null>;
 
-    findAll(query: any): Promise<Movie[]>;
+	findAll(query: Record<string, any>): Promise<Movie[]>;
 
-    update(movie: Movie | number, data: Record<string, any>): Promise<Movie | null>;
+	update(movie: Movie | number, data: Record<string, any>): Promise<Movie | null>;
 }
 
 @injectable()
 @singleton()
 export class MovieRepo implements BaseMovieRepo {
-    constructor(
-        @inject('BaseCache') private cache: BaseCache,
-    ) { }
+	constructor(
+		@inject('BaseCache') private cache: BaseCache,
+	) { }
 
-    create = async (data: Record<string, any>): Promise<Movie> => {
-        const movie = await Movie.create(data);
+	create = async (data: Record<string, any>): Promise<Movie> => {
+		const movie = await Movie.create(data);
 
-        return movie;
-    }
+		return movie;
+	}
 
-    bulkCreate = async (data: Record<string, any>[]): Promise<Movie[]> => {
-        const movies = await Movie.bulkCreate(data);
+	bulkCreate = async (data: Record<string, any>[]): Promise<Movie[]> => {
+		const movies = await Movie.bulkCreate(data);
 
-        return movies;
-    }
+		return movies;
+	}
 
-    findOne = async (query: any): Promise<Movie | null> => {
-        const data = await this.cache.get(query);
+	findOne = async (query: Record<string, any>): Promise<Movie | null> => {
+		const cacheKey = this.cacheKey(query);
 
-        let movie: Movie; 
+		const data = await this.cache.get(cacheKey);
 
-        if (data) {
-            const json = JSON.parse(data);
-            movie = Movie.build(json);
-        } else {
-            movie = await Movie.findOne(query);
+		let movie: Movie | null;
 
-            // cache result
-            await this.cache.set(query, movie.toJSON())
-        }
+		if (data) {
+			const json = JSON.parse(data);
+			movie = Movie.build(json);
+		} else {
+			movie = await Movie.findOne(query);
 
-        return movie;
-    }
+			// cache result
+			if (movie) await this.cache.set(cacheKey, JSON.stringify(movie.toJSON()))
+		}
 
-    findAll = async (query: any): Promise<Movie[]> => {
-        const data = await this.cache.get(query);
+		return movie;
+	}
 
-        let movies: Movie[];
+	findAll = async (query: Record<string, any>): Promise<Movie[]> => {
+		const cacheKey = this.cacheKey(query);
 
-        if (data) {
-            const json: [] = JSON.parse(data);
-            movies = json.map(e => Movie.build(e));
-        } else {
-            movies = await Movie.findAll(query);
+		const data = await this.cache.get(cacheKey);
 
-            // cache results
-            await this.cache.set(query, movies.map(e => e.toJSON()))
-        }
+		let movies: Movie[];
 
-        return movies;
-    }
+		if (data) {
+			const json: [] = JSON.parse(data);
+			movies = json.map(e => Movie.build(e));
+		} else {
+			movies = await Movie.findAll(query);
 
-    update = async (movieOrId: Movie | number, data: Record<string, any>): Promise<Movie | null> => {
-        let movie: Movie | null;
+			// cache results
+			if (movies) await this.cache.set(
+				cacheKey,
+				JSON.stringify(movies.map(e => (e.toJSON())))
+			);
+		}
 
-        if (movieOrId instanceof Number) {
-            movie = await this.findOne({ where: { id: movieOrId } });
-        } else {
-            movie = movieOrId as Movie;
-        }
+		return movies;
+	}
 
-        if (!movie) return null;
+	update = async (movieOrId: Movie | number, data: Record<string, any>): Promise<Movie | null> => {
+		let movie: Movie | null;
 
-        if(data.extData){
-            movie.setDataValue('extData', data.extData);
-        }
-        
-        let modifiedMovie = null;
+		if (movieOrId instanceof Number) {
+			movie = await this.findOne({ where: { id: movieOrId } });
+		} else {
+			movie = movieOrId as Movie;
+		}
 
-        if(movie.changed()){
-            modifiedMovie = await movie.save();
-        }
+		if (!movie) return null;
 
-        return modifiedMovie;
-    }
+		if (data.extData) {
+			movie.setDataValue('extData', data.extData);
+		}
+
+		let modifiedMovie = null;
+
+		if (movie.changed()) {
+			modifiedMovie = await movie.save();
+		}
+
+		return modifiedMovie;
+	}
+
+	private cacheKey = (key: any) => {
+		if (!key.where.tsvector) return `movies.${JSON.stringify(key)}`;
+
+		const keyClone = JSON.parse(JSON.stringify(key));
+
+		delete key.where.searchable;
+		delete keyClone.where.tsvector;
+
+		return `movies.${JSON.stringify(keyClone)}`;
+	}
 }

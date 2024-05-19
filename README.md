@@ -1,5 +1,12 @@
 # Movie api
 
+## Features
+
+1- Authentication & Authorization<br/>
+2- Caching (Redis)<br/>
+3- Rate Limiting<br/>
+3- The Movie DB Api Integration
+
 ## Prerequisites
 
 1- docker<br/>
@@ -25,5 +32,5 @@ cp .env.example .env
 
 3- build images and run containers
 ```console
-docker-compose -f ./docker/docker-compose.yml -f ./docker/docker-compose-dev.yml --env-file ./.env up 
+docker-compose -f ./docker-compose.yml -f ./docker-compose-prod.yml --env-file ./.env up
 ```

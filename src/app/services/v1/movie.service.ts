@@ -61,10 +61,10 @@ export class MovieService implements BaseMovieService {
 
         const where = {};
 
-        if (id) {
+        if (id) { 
             // @ts-ignore
             where.id = id;
-        }
+        } 
 
         let searchable = '';
         if (title) {
@@ -76,10 +76,12 @@ export class MovieService implements BaseMovieService {
         if (genre) {
             searchable = searchable.length > 0 ? `${searchable} | ${genre}` : genre; 
         }
-        
+
         if (title || director || genre) {
             // @ts-ignore
             where.tsvector = { [sequelize.Op.match]: sequelize.fn('to_tsquery', searchable) };
+            // @ts-ignore
+            where.searchable = searchable;
         }
 
         const query = {};
@@ -123,6 +125,8 @@ export class MovieService implements BaseMovieService {
         if (title || director || genre) {
             // @ts-ignore
             where.tsvector = { [sequelize.Op.match]: sequelize.fn('to_tsquery', searchable) };
+            // @ts-ignore
+            where.searchable = searchable;
         }
 
         const query = {

@@ -4,7 +4,7 @@ import { Logger } from 'helpers/logger';
 
 container.register('AppLogger', { useValue: new Logger('app') });
 container.register('TMDBLogger', { useValue: new Logger('tmdb') });
-container.register('RedisLogger', { useValue: new Logger('redis') });
+container.register('CacheLogger', { useValue: new Logger('cache') });
 container.register('RateLimitingLogger', { useValue: new Logger('rate-limiting') });
 container.register('JWTLogger', { useValue: new Logger('jwt') });
 container.register('AuthLogger', { useValue: new Logger('auth') });
